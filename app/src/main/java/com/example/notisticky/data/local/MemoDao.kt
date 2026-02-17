@@ -1,0 +1,20 @@
+package com.example.notisticky.data.local
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface MemoDao {
+    @Query("SELECT * FROM memos ORDER BY createdAt DESC")
+    fun getAllMemos(): Flow<List<MemoEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMemo(memo: MemoEntity)
+
+    @Delete
+    suspend fun deleteMemo(memo: MemoEntity)
+}
