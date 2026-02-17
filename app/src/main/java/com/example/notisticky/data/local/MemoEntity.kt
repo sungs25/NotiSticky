@@ -4,10 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "memos") // 보통 테이블명은 소문자 복수형을 많이 씁니다 (선택사항)
-data class MemoEntity( // private 제거!
+@Entity(tableName = "memos")
+data class MemoEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0, // 초기값 0 설정 (새 글 작성 시 편함), var -> val 권장(ID는 안 바뀌니까)
+    val id: Long = 0,
 
     @ColumnInfo(name = "content")
     var content: String,
