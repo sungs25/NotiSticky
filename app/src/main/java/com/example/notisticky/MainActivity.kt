@@ -3,10 +3,10 @@ package com.example.notisticky
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.notisticky.ui.add.MemoAddScreen
 import com.example.notisticky.ui.home.HomeScreen
 import com.example.notisticky.ui.theme.NotiStickyTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // 테마 설정
+            // 테마 설정ㄴ
             NotiStickyTheme {
                 // 운전대 생성
                 val navController = rememberNavController()
@@ -33,7 +33,9 @@ class MainActivity : ComponentActivity() {
 
                     // URL 2: add
                     composable("add") {
-                        Text("여기는 메모 작성 화면")
+                        MemoAddScreen() {
+                            navController.popBackStack()
+                        }
                     }
                 }
             }
