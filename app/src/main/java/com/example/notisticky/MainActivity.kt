@@ -1,8 +1,13 @@
 package com.example.notisticky
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,27 +16,38 @@ import com.example.notisticky.ui.home.HomeScreen
 import com.example.notisticky.ui.theme.NotiStickyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint //Hilt 시작점
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // 테마 설정ㄴ
             NotiStickyTheme {
-                // 운전대 생성
+
+
+                // 권한 요청 런처 만들기
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { isGranted ->
+                        // 허락받았을 때/거절당했을 때 로직 (일단 비워둠)
+                    }
+                )
+
+                // 앱 켜질 때 딱 한 번 권한 요청 실행
+                LaunchedEffect(Unit) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+
+
                 val navController = rememberNavController()
 
-                // 라우터 설정
                 NavHost(navController = navController, startDestination = "home") {
-
-                    // URL 1: home
                     composable("home") {
                         HomeScreen() {
                             navController.navigate("add")
                         }
                     }
-
-                    // URL 2: add
                     composable("add") {
                         MemoAddScreen() {
                             navController.popBackStack()
@@ -42,4 +58,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
