@@ -70,7 +70,7 @@ class NotificationHelper @Inject constructor(
             .setContentText(memo.content)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pendingIntent)
-            .setOngoing(false)
+            .setOngoing(true)
             .setDeleteIntent(dismissPendingIntent)
 
         notificationManager.notify(memo.id.toInt(), builder.build())

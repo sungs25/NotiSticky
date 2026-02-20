@@ -20,4 +20,7 @@ interface MemoDao {
 
     @Query("UPDATE memos SET isPosted = 0 WHERE id = :id")
     suspend fun turnOffMemo(id: Long)
+
+    @Query("SELECT * FROM memos WHERE id = :id")
+    suspend fun getMemoById(id: Long): MemoEntity?
 }
