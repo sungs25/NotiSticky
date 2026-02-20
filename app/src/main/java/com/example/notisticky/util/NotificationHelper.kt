@@ -47,7 +47,7 @@ class NotificationHelper @Inject constructor(
 
     // 알림 띄우기
     fun showNotification(memo: MemoEntity) {
-        // 알림 클릭하면 앱이 열리게 하는 '인텐트' 준비
+        // 알림 클릭 시 앱 열기
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -55,16 +55,24 @@ class NotificationHelper @Inject constructor(
             context, 0, intent, PendingIntent.FLAG_IMMUTABLE
         )
 
+        // 알림 삭제(스와이프) 시 실행될 인텐트
+        val dismissIntent = Intent(context, com.example.notisticky.receiver.NotificationDismissReceiver::class.java).apply {
+            putExtra("MEMO_ID", memo.id) // 어떤 메모가 지워졌는지 ID를 담아둠
+        }
+        val dismissPendingIntent = PendingIntent.getBroadcast(
+            context, memo.id.toInt(), dismissIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         // 알림 꾸미기
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // 아이콘 (기본 안드로이드 아이콘)
-            .setContentTitle(null) // 제목 없음
-            .setContentText(memo.content) // 내용 넣기
-            .setPriority(NotificationCompat.PRIORITY_LOW) // 소리 안 나게
-            .setContentIntent(pendingIntent) // 클릭 시 앱 열기
-            .setOngoing(true) // 사용자가 스와이프해서 못 지우게 함 (Sticky)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(null)
+            .setContentText(memo.content)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(pendingIntent)
+            .setOngoing(false)
+            .setDeleteIntent(dismissPendingIntent)
 
-        // 알림 설정
         notificationManager.notify(memo.id.toInt(), builder.build())
     }
 

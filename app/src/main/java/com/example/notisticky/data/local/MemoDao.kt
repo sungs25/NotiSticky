@@ -17,4 +17,7 @@ interface MemoDao {
 
     @Delete
     suspend fun deleteMemo(memo: MemoEntity)
+
+    @Query("UPDATE memos SET isPosted = 0 WHERE id = :id")
+    suspend fun turnOffMemo(id: Long)
 }
