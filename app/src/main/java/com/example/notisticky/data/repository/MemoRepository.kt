@@ -36,4 +36,8 @@ class MemoRepository @Inject constructor(
             notificationHelper.cancelNotification(updatedMemo)
         }
     }
+
+    suspend fun getMemoById(id: Long): MemoEntity? {
+        return memoDao.getMemoById(id)
+    }
 }

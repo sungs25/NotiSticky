@@ -1,5 +1,6 @@
 package com.example.notisticky.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,12 +13,14 @@ import com.example.notisticky.data.local.MemoEntity
 @Composable
 fun MemoItem(
     memo: MemoEntity,
-    onToggle: (MemoEntity) -> Unit
+    onToggle: (MemoEntity) -> Unit,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

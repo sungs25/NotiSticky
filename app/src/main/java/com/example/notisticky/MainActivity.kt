@@ -15,6 +15,8 @@ import com.example.notisticky.ui.add.MemoAddScreen
 import com.example.notisticky.ui.home.HomeScreen
 import com.example.notisticky.ui.theme.NotiStickyTheme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -43,12 +45,28 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = "home") {
+
+                    // 1. Home 화면 (수정: 아이템 클릭 시 해당 ID를 들고 add로 이동)
                     composable("home") {
-                        HomeScreen() {
-                            navController.navigate("add")
-                        }
+                        HomeScreen(
+                            onAddClick = { navController.navigate("add") }, // 플러스 버튼
+                            onMemoClick = { memoId ->
+                                navController.navigate("add?memoId=$memoId") // 메모 클릭
+                            }
+                        )
                     }
-                    composable("add") {
+
+                    // 2. Add 화면 (수정: memoId 파라미터 받기)
+                    // URL 형식을 "add?memoId={memoId}" 로 변경
+                    composable(
+                        route = "add?memoId={memoId}",
+                        arguments = listOf(
+                            navArgument("memoId") {
+                                type = NavType.LongType
+                                defaultValue = -1L // 안 넘겨주면 -1 (새 메모)
+                            }
+                        )
+                    ) {
                         MemoAddScreen() {
                             navController.popBackStack()
                         }

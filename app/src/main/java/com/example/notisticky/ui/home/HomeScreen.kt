@@ -17,8 +17,8 @@ import com.example.notisticky.ui.components.MemoItem
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    onMemoClick: (Long) -> Unit
 ) {
     //데이터 구독 (StateFlow -> State)
     val memos by viewModel.memoList.collectAsState()
@@ -48,7 +48,8 @@ fun HomeScreen(
                     memo = memo,
                     onToggle = { clickedMemo ->
                         viewModel.onToggle(clickedMemo)
-                    }
+                    },
+                    onClick = { onMemoClick(memo.id) }
                 )
             }
         }
