@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "home") {
 
-                    // 1. Home 화면 (수정: 아이템 클릭 시 해당 ID를 들고 add로 이동)
+                    //Home 화면 (아이템 클릭 시 해당 ID를 들고 add로 이동)
                     composable("home") {
                         HomeScreen(
                             onAddClick = { navController.navigate("add") }, // 플러스 버튼
@@ -56,8 +56,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 2. Add 화면 (수정: memoId 파라미터 받기)
-                    // URL 형식을 "add?memoId={memoId}" 로 변경
+                    // Add 화면 (memoId 파라미터 받기)
                     composable(
                         route = "add?memoId={memoId}",
                         arguments = listOf(

@@ -13,23 +13,24 @@ import javax.inject.Inject
 @HiltViewModel
 class MemoAddViewModel @Inject constructor(
     private val repository: MemoRepository,
-    savedStateHandle: SavedStateHandle // 네비게이션 파라미터를 받는 객체
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     var content = mutableStateOf("")
         private set
 
-    // 현재 작업 중인 메모의 ID (기본값 0L = 새 메모)
-    private var currentMemoId: Long = 0L
+    private var currentMemoId = mutableStateOf(0L)
+
+    val isEditMode: Boolean
+        get() = currentMemoId.value != 0L
 
     init {
         val memoId = savedStateHandle.get<Long>("memoId") ?: -1L
         if (memoId != -1L) {
-            // 넘어온 ID가 있다면 수정
             viewModelScope.launch {
                 repository.getMemoById(memoId)?.let { existingMemo ->
-                    currentMemoId = existingMemo.id
-                    content.value = existingMemo.content // 화면에 기존 내용 채워넣기
+                    currentMemoId.value = existingMemo.id
+                    content.value = existingMemo.content
                 }
             }
         }
@@ -44,10 +45,19 @@ class MemoAddViewModel @Inject constructor(
         if (text.isBlank()) return
 
         viewModelScope.launch {
-            // id = 0이면 새 메모 생성, 기존 ID면 덮어쓰기 됨
-            val memo = MemoEntity(id = currentMemoId, content = text)
+            val memo = MemoEntity(id = currentMemoId.value, content = text)
             repository.insert(memo)
             onSaved()
+        }
+    }
+
+    fun deleteMemo(onDeleted: () -> Unit) {
+        if (currentMemoId.value == 0L) return
+
+        viewModelScope.launch {
+            val memoToDelete = MemoEntity(id = currentMemoId.value, content = content.value)
+            repository.delete(memoToDelete)
+            onDeleted()
         }
     }
 }
