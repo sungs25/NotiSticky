@@ -6,6 +6,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,6 +21,9 @@ fun MemoAddScreen(
     // 뒤로가기 함수 (저장 완료 후 or 뒤로가기 버튼 클릭 시)
     onBack: () -> Unit
 ) {
+    // 팝업을 띄울지 말지 결정하는 상태 변수
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -34,7 +41,7 @@ fun MemoAddScreen(
                 actions = {
                     if (viewModel.isEditMode) { // 수정 모드일 때만 휴지통 보이기
                         IconButton(
-                            onClick = { viewModel.deleteMemo(onDeleted = onBack) }
+                            onClick = { showDeleteDialog = true }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -71,5 +78,30 @@ fun MemoAddScreen(
                 Text(if (viewModel.isEditMode) "수정하기" else "저장하기")
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false }, // 팝업 바깥을 터치하면 닫힘
+            title = { Text("메모 삭제") },
+            text = { Text("이 메모를 정말 삭제하시겠습니까?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.deleteMemo(onDeleted = onBack) // 진짜 삭제 실행
+                    }
+                ) {
+                    Text("삭제", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false } // 취소 누르면 창만 닫음
+                ) {
+                    Text("취소")
+                }
+            }
+        )
     }
 }
