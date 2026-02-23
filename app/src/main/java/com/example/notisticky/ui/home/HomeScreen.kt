@@ -1,16 +1,19 @@
 package com.example.notisticky.ui.home
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notisticky.ui.components.MemoItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,37 +23,42 @@ fun HomeScreen(
     onAddClick: () -> Unit,
     onMemoClick: (Long) -> Unit
 ) {
-    //데이터 구독 (StateFlow -> State)
-    val memos by viewModel.memoList.collectAsState()
+    // DB 데이터 구독
+    val memos by viewModel.memoList.collectAsStateWithLifecycle()
 
     Scaffold(
-        // 상단바
-        topBar = {
-            TopAppBar(title = { Text("NotiSticky") })
-        },
-        // 우측 하단 + 버튼
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "메모 추가")
+            FloatingActionButton(
+                onClick = onAddClick,
+                containerColor = Color(0xFF333333),
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "메모 추가")
             }
         }
     ) { innerPadding ->
-        //리스트 그리기 (RecyclerView 대체)
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            // memos 리스트를 반복해서 그림
-            items(
-                items = memos,
-                key = { memo -> memo.id } // ID로 구분
-            ) { memo ->
-                MemoItem(
-                    memo = memo,
-                    onToggle = { clickedMemo ->
-                        viewModel.onToggle(clickedMemo)
-                    },
-                    onClick = { onMemoClick(memo.id) }
+            if (memos.isEmpty()) {
+                Text(
+                    text = "메모를 기록해 보세요.",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.align(Alignment.Center)
                 )
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(items = memos, key = { it.id }) { memo ->
+                        MemoItem(
+                            memo = memo,
+                            onToggle = { viewModel.onToggle(it) },
+                            onClick = { onMemoClick(memo.id) }
+                        )
+                    }
+                }
             }
         }
     }

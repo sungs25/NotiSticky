@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     // 1. Navigation Compose (화면 이동)
     implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation(libs.play.services.maps)
 
     // 2. Room (내부 DB) - KSP 사용
     val roomVersion = "2.6.1"
@@ -81,4 +82,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation("androidx.compose.material:material-icons-extended")
 }
