@@ -23,4 +23,7 @@ interface MemoDao {
 
     @Query("SELECT * FROM memos WHERE id = :id")
     suspend fun getMemoById(id: Long): MemoEntity?
+
+    @Query("SELECT * FROM memos WHERE isPosted = 1")
+    suspend fun getPostedMemos(): List<MemoEntity>
 }

@@ -52,7 +52,7 @@ class NotificationHelper @Inject constructor(
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent, PendingIntent.FLAG_IMMUTABLE
+            context, memo.id.toInt(), intent, PendingIntent.FLAG_IMMUTABLE
         )
 
         // 알림 삭제(스와이프) 시 실행될 인텐트
