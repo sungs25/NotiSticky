@@ -2,6 +2,7 @@ package com.example.notisticky.ui.add
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
@@ -9,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,9 +39,7 @@ fun MemoAddScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { }, // 제목 비우기
                 navigationIcon = {
-                    // 화면 상단의 '뒤로 가기 화살표'를 누를 때도 자동 저장
                     IconButton(onClick = {
                         if (viewModel.content.value.isNotBlank()) {
                             viewModel.saveMemo(onSaved = onBack)
@@ -49,19 +49,22 @@ fun MemoAddScreen(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "저장 및 뒤로가기",
+                            contentDescription = "뒤로가기",
                             tint = Color(0xFF333333)
                         )
                     }
                 },
+                title = { },
                 actions = {
-                    // 수정 모드일 때만 휴지통 보이기
                     if (viewModel.isEditMode) {
-                        IconButton(onClick = { showDeleteDialog = true }) {
+                        IconButton(
+                            onClick = { showDeleteDialog = true },
+                            modifier = Modifier.padding(end = 12.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.Delete,
                                 contentDescription = "삭제",
-                                tint = Color.LightGray
+                                tint = Color(0xFF757575)
                             )
                         }
                     }
@@ -73,39 +76,35 @@ fun MemoAddScreen(
         },
         containerColor = Color.White
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .padding(24.dp)
         ) {
-            // 화면 전체를 차지하는 테두리 없는 텍스트 에디터
-            TextField(
-                modifier = Modifier
-                    .fillMaxSize() // 남은 화면 꽉 채우기
-                    .padding(horizontal = 24.dp),
+            BasicTextField(
                 value = viewModel.content.value,
                 onValueChange = { viewModel.updateContent(it) },
-                placeholder = {
-                    Text(
-                        "메모를 작성하세요",
-                        color = Color.LightGray,
-                        fontFamily = Pretendard
-                    )
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent, // 밑줄 완벽 제거
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color(0xFF333333)
-                ),
+                modifier = Modifier.fillMaxSize(),
                 textStyle = LocalTextStyle.current.copy(
                     fontFamily = Pretendard,
                     fontSize = 18.sp,
                     lineHeight = 28.sp,
                     color = Color(0xFF333333)
-                )
+                ),
+                cursorBrush = SolidColor(Color(0xFF333333)),
+                decorationBox = { innerTextField ->
+                    if (viewModel.content.value.isEmpty()) {
+                        Text(
+                            text = "메모를 작성하세요",
+                            color = Color(0xFFBDBDBD),
+                            fontSize = 18.sp,
+                            fontFamily = Pretendard
+                        )
+                    }
+                    // 실제 텍스트가 그려지는 부분
+                    innerTextField()
+                }
             )
         }
     }

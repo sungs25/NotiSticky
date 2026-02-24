@@ -94,9 +94,8 @@ class NotificationHelper @Inject constructor(
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setDeleteIntent(dismissPendingIntent)
-            // 🌟 [수정] 액션 버튼을 '고정 해제'로 변경!
             .addAction(
-                android.R.drawable.ic_menu_close_clear_cancel, // 기본 X 모양(닫기) 아이콘
+                android.R.drawable.ic_menu_close_clear_cancel,
                 "고정 해제", // 텍스트 변경
                 unpinPendingIntent
             )
