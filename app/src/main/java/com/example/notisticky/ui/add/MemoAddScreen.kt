@@ -1,105 +1,132 @@
 package com.example.notisticky.ui.add
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.notisticky.ui.theme.Pretendard
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemoAddScreen(
     viewModel: MemoAddViewModel = hiltViewModel(),
-    // 뒤로가기 함수 (저장 완료 후 or 뒤로가기 버튼 클릭 시)
     onBack: () -> Unit
 ) {
-    // 팝업을 띄울지 말지 결정하는 상태 변수
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // 스마트폰의 물리적 '뒤로 가기' 제스처를 할 때 자동 저장
+    BackHandler {
+        if (viewModel.content.value.isNotBlank()) {
+            viewModel.saveMemo(onSaved = onBack)
+        } else {
+            onBack() // 내용이 없으면 그냥 뒤로 가기
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                // 모드에 따라 타이틀 변경
-                title = { Text(if (viewModel.isEditMode) "메모 수정" else "새 메모") },
+                title = { }, // 제목 비우기
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    // 화면 상단의 '뒤로 가기 화살표'를 누를 때도 자동 저장
+                    IconButton(onClick = {
+                        if (viewModel.content.value.isNotBlank()) {
+                            viewModel.saveMemo(onSaved = onBack)
+                        } else {
+                            onBack()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로가기"
+                            contentDescription = "저장 및 뒤로가기",
+                            tint = Color(0xFF333333)
                         )
                     }
                 },
-                // 우측 상단 액션 버튼 영역 (휴지통)
                 actions = {
-                    if (viewModel.isEditMode) { // 수정 모드일 때만 휴지통 보이기
-                        IconButton(
-                            onClick = { showDeleteDialog = true }
-                        ) {
+                    // 수정 모드일 때만 휴지통 보이기
+                    if (viewModel.isEditMode) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
-                                imageVector = Icons.Default.Delete,
+                                imageVector = Icons.Outlined.Delete,
                                 contentDescription = "삭제",
-                                tint = MaterialTheme.colorScheme.error
+                                tint = Color.LightGray
                             )
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White
+                )
             )
-        }
+        },
+        containerColor = Color.White
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
                 .fillMaxSize()
         ) {
-            OutlinedTextField(
+            // 화면 전체를 차지하는 테두리 없는 텍스트 에디터
+            TextField(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .fillMaxSize() // 남은 화면 꽉 채우기
+                    .padding(horizontal = 24.dp),
                 value = viewModel.content.value,
                 onValueChange = { viewModel.updateContent(it) },
-                placeholder = { Text("내용을 입력하세요") }
+                placeholder = {
+                    Text(
+                        "메모를 작성하세요",
+                        color = Color.LightGray,
+                        fontFamily = Pretendard
+                    )
+                },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent, // 밑줄 완벽 제거
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = Color(0xFF333333)
+                ),
+                textStyle = LocalTextStyle.current.copy(
+                    fontFamily = Pretendard,
+                    fontSize = 18.sp,
+                    lineHeight = 28.sp,
+                    color = Color(0xFF333333)
+                )
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { viewModel.saveMemo(onSaved = onBack) }
-            ) {
-                Text(if (viewModel.isEditMode) "수정하기" else "저장하기")
-            }
         }
     }
 
+    // 팝업창은 기존과 동일
     if (showDeleteDialog) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false }, // 팝업 바깥을 터치하면 닫힘
-            title = { Text("메모 삭제") },
-            text = { Text("이 메모를 정말 삭제하시겠습니까?") },
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("메모 삭제",  fontFamily = Pretendard,  fontWeight = FontWeight.Bold) },
+            text = { Text("이 메모를 정말 삭제하시겠습니까?", fontFamily = Pretendard ) },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        viewModel.deleteMemo(onDeleted = onBack) // 진짜 삭제 실행
-                    }
-                ) {
-                    Text("삭제", color = MaterialTheme.colorScheme.error)
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                    viewModel.deleteMemo(onDeleted = onBack)
+                }) {
+                    Text("삭제", color = Color(0xFFE53935),  fontFamily = Pretendard )
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { showDeleteDialog = false } // 취소 누르면 창만 닫음
-                ) {
-                    Text("취소")
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("취소", color = Color.Gray, fontFamily = Pretendard )
                 }
             }
         )
