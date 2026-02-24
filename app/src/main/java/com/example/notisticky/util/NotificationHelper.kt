@@ -75,7 +75,17 @@ class NotificationHelper @Inject constructor(
             context, memo.id.toInt(), dismissIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        // 알림 꾸미기
+        val unpinIntent = Intent(context, com.example.notisticky.receiver.UnpinReceiver::class.java).apply {
+            putExtra("MEMO_ID", memo.id)
+        }
+        val unpinPendingIntent = PendingIntent.getBroadcast(
+            context,
+            memo.id.toInt(),
+            unpinIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // 알림 꾸미기 (builder)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(null)
@@ -84,6 +94,12 @@ class NotificationHelper @Inject constructor(
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setDeleteIntent(dismissPendingIntent)
+            // 🌟 [수정] 액션 버튼을 '고정 해제'로 변경!
+            .addAction(
+                android.R.drawable.ic_menu_close_clear_cancel, // 기본 X 모양(닫기) 아이콘
+                "고정 해제", // 텍스트 변경
+                unpinPendingIntent
+            )
 
         notificationManager.notify(memo.id.toInt(), builder.build())
     }
