@@ -17,6 +17,7 @@ import com.example.notisticky.ui.theme.NotiStickyTheme
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import androidx.navigation.navDeepLink
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -64,11 +65,14 @@ class MainActivity : ComponentActivity() {
                                 type = NavType.LongType
                                 defaultValue = -1L // 안 넘겨주면 -1 (새 메모)
                             }
+                        ),
+                        deepLinks = listOf(
+                            navDeepLink { uriPattern = "notisticky://memo/{memoId}" }
                         )
                     ) {
-                        MemoAddScreen() {
-                            navController.popBackStack()
-                        }
+                        MemoAddScreen(
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                 }
             }

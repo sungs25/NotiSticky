@@ -13,6 +13,8 @@ import com.example.notisticky.data.local.MemoEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import android.net.Uri
+import androidx.core.net.toUri
 
 @Singleton
 class NotificationHelper @Inject constructor(
@@ -47,12 +49,22 @@ class NotificationHelper @Inject constructor(
 
     // 알림 띄우기
     fun showNotification(memo: MemoEntity) {
-        // 알림 클릭 시 앱 열기
-        val intent = Intent(context, MainActivity::class.java).apply {
+        // 딥링크(특정 목적지)를 향하는 인텐트 생성
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "notisticky://memo/${memo.id}".toUri(), /* 고유 주소 */
+            context,
+            MainActivity::class.java
+        ).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+
+        // 알림마다 고유 티켓 번호 부여
         val pendingIntent = PendingIntent.getActivity(
-            context, memo.id.toInt(), intent, PendingIntent.FLAG_IMMUTABLE
+            context,
+            memo.id.toInt(),
+            deepLinkIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // 알림 삭제(스와이프) 시 실행될 인텐트
