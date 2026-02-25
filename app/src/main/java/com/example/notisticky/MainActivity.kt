@@ -21,6 +21,7 @@ import androidx.navigation.navDeepLink
 import com.example.notisticky.ui.onboarding.OnboardingScreen
 import com.example.notisticky.util.AdManager
 import com.google.android.gms.ads.MobileAds
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -34,67 +35,63 @@ class MainActivity : ComponentActivity() {
         setContent {
             NotiStickyTheme {
 
+                val mainViewModel: MainViewModel = hiltViewModel()
 
-                // 권한 요청 런처 만들기
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        // 허락받았을 때/거절당했을 때 로직 (일단 비워둠)
-                    }
-                )
-
-                // 앱 켜질 때 딱 한 번 권한 요청 실행
-                LaunchedEffect(Unit) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
+                if (mainViewModel.isLoading.value) {
+                    // DataStore에서 값을 읽어오는 0.1초 동안 텅 빈 하얀 화면을 그려서 대기합니다.
+                } else {
+                    // 로딩이 끝났다면 본격적으로 앱 화면을 그리기
 
 
-                val navController = rememberNavController()
+                    val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "onboarding") {
-
-                    // 온보딩 화면 추가
-                    composable("onboarding") {
-                        OnboardingScreen(
-                            onFinish = {
-                                // 시작하기 버튼 누르면 온보딩을 백스택에서 지우고 홈으로 이동
-                                navController.navigate("home") {
-                                    popUpTo("onboarding") { inclusive = true }
-                                }
-                            }
-                        )
-                    }
-
-                    //Home 화면 (아이템 클릭 시 해당 ID를 들고 add로 이동)
-                    composable("home") {
-                        HomeScreen(
-                            onAddClick = { navController.navigate("add") }, // 플러스 버튼
-                            onMemoClick = { memoId ->
-                                navController.navigate("add?memoId=$memoId") // 메모 클릭
-                            }
-                        )
-                    }
-
-                    // Add 화면 (memoId 파라미터 받기)
-                    composable(
-                        route = "add?memoId={memoId}",
-                        arguments = listOf(
-                            navArgument("memoId") {
-                                type = NavType.LongType
-                                defaultValue = -1L // 안 넘겨주면 -1 (새 메모)
-                            }
-                        ),
-                        deepLinks = listOf(
-                            navDeepLink { uriPattern = "notisticky://memo/{memoId}" }
-                        )
+                    NavHost(
+                        navController = navController,
+                        startDestination = mainViewModel.startDestination.value
                     ) {
-                        MemoAddScreen(
-                            onBack = { navController.popBackStack() }
-                        )
+
+                        // 온보딩 화면 추가
+                        composable("onboarding") {
+                            OnboardingScreen(
+                                onFinish = {
+                                    mainViewModel.finishOnboarding()
+
+                                    navController.navigate("home") {
+                                        popUpTo("onboarding") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+
+                        // Home 화면
+                        composable("home") {
+                            HomeScreen(
+                                onAddClick = { navController.navigate("add") },
+                                onMemoClick = { memoId ->
+                                    navController.navigate("add?memoId=$memoId")
+                                }
+                            )
+                        }
+
+                        // Add 화면
+                        composable(
+                            route = "add?memoId={memoId}",
+                            arguments = listOf(
+                                navArgument("memoId") {
+                                    type = NavType.LongType
+                                    defaultValue = -1L
+                                }
+                            ),
+                            deepLinks = listOf(
+                                navDeepLink { uriPattern = "notisticky://memo/{memoId}" }
+                            )
+                        ) {
+                            MemoAddScreen(
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
-                }
+                } // else 닫기
             }
         }
     }

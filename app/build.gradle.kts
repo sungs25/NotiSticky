@@ -58,22 +58,22 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    // 1. Navigation Compose (화면 이동)
+    // Navigation Compose (화면 이동)
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation(libs.play.services.maps)
 
-    // 2. Room (내부 DB) - KSP 사용
+    // Room (내부 DB) - KSP 사용
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    // 3. Hilt (의존성 주입)
+    // Hilt (의존성 주입)
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    // 4. Google AdMob (광고 - Firebase 없이 단독 사용)
+    // Google AdMob (광고 - Firebase 없이 단독 사용)
     implementation("com.google.android.gms:play-services-ads:23.3.0")
 
     testImplementation(libs.junit)
@@ -85,4 +85,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     implementation("androidx.compose.material:material-icons-extended")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0") // DataStore 라이브러리
 }

@@ -31,6 +31,11 @@ import androidx.compose.ui.unit.sp
 import com.example.notisticky.R
 import com.example.notisticky.service.MemoTileService
 import kotlinx.coroutines.launch
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 
 // 온보딩 내용 데이터
 data class OnboardingPage(
@@ -71,6 +76,16 @@ fun OnboardingScreen(
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            // 권한을 허용하든 거절하든, 팝업이 닫히면 무조건 홈 화면으로 보냅니다.
+            onFinish()
+        }
+    )
 
     Scaffold(
         containerColor = Color.White
@@ -117,7 +132,24 @@ fun OnboardingScreen(
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         } else {
-                            onFinish()
+                            // 마지막 3페이지에서 '시작하기' 버튼을 눌렀을 때
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                //  팝업을 띄우기 전에, 이미 권한이 있는지 먼저 검사
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    // 이미 권한이 있다면 바로 홈으로
+                                    onFinish()
+                                } else {
+                                    // 권한이 없을 때만 런처를 실행해서 팝업 요청
+                                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                            } else {
+                                // 안드로이드 12 이하는 프리패스
+                                onFinish()
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
