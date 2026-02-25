@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.notisticky.ui.theme.Pretendard
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 
 
 
@@ -26,6 +28,14 @@ fun MemoAddScreen(
     onBack: () -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // 텍스트 창에 포커스를 줄 요청기
+    val focusRequester = remember { FocusRequester() }
+
+    // 화면이 처음 열릴 때 딱 한 번, 커서를 꽂아달라고 요청
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     // 스마트폰의 물리적 '뒤로 가기' 제스처를 할 때 자동 저장
     BackHandler {
@@ -85,7 +95,9 @@ fun MemoAddScreen(
             BasicTextField(
                 value = viewModel.content.value,
                 onValueChange = { viewModel.updateContent(it) },
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .focusRequester(focusRequester),
                 textStyle = LocalTextStyle.current.copy(
                     fontFamily = Pretendard,
                     fontSize = 18.sp,
