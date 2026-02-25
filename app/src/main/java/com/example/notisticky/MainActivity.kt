@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import androidx.navigation.navDeepLink
+import com.example.notisticky.ui.onboarding.OnboardingScreen
 import com.example.notisticky.util.AdManager
 import com.google.android.gms.ads.MobileAds
 
@@ -52,7 +53,19 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = "home") {
+                NavHost(navController = navController, startDestination = "onboarding") {
+
+                    // 온보딩 화면 추가
+                    composable("onboarding") {
+                        OnboardingScreen(
+                            onFinish = {
+                                // 시작하기 버튼 누르면 온보딩을 백스택에서 지우고 홈으로 이동
+                                navController.navigate("home") {
+                                    popUpTo("onboarding") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
 
                     //Home 화면 (아이템 클릭 시 해당 ID를 들고 add로 이동)
                     composable("home") {
