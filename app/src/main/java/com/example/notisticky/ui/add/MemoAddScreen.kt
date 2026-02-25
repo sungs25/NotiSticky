@@ -1,5 +1,6 @@
 package com.example.notisticky.ui.add
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -18,7 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.notisticky.ui.theme.Pretendard
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-
+import androidx.compose.ui.platform.LocalContext
+import com.example.notisticky.util.AdManager
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,6 +34,24 @@ fun MemoAddScreen(
     // 텍스트 창에 포커스를 줄 요청기
     val focusRequester = remember { FocusRequester() }
 
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    val handleSaveAndExit = {
+        if (viewModel.content.value.isNotBlank() && viewModel.isModified) {
+            viewModel.saveMemo(onSaved = {
+                if (activity != null) {
+                    AdManager.showAdIfReady(activity, onAdDismissed = { onBack() })
+                } else {
+                    onBack()
+                }
+            })
+
+        } else {
+            onBack()
+        }
+    }
+
     // 화면이 처음 열릴 때 딱 한 번, 커서를 꽂아달라고 요청
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -39,11 +59,7 @@ fun MemoAddScreen(
 
     // 스마트폰의 물리적 '뒤로 가기' 제스처를 할 때 자동 저장
     BackHandler {
-        if (viewModel.content.value.isNotBlank()) {
-            viewModel.saveMemo(onSaved = onBack)
-        } else {
-            onBack() // 내용이 없으면 그냥 뒤로 가기
-        }
+        handleSaveAndExit()
     }
 
     Scaffold(
@@ -51,11 +67,7 @@ fun MemoAddScreen(
             TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (viewModel.content.value.isNotBlank()) {
-                            viewModel.saveMemo(onSaved = onBack)
-                        } else {
-                            onBack()
-                        }
+                        handleSaveAndExit()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

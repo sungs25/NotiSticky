@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import androidx.navigation.navDeepLink
+import com.example.notisticky.util.AdManager
 import com.google.android.gms.ads.MobileAds
 
 @AndroidEntryPoint
@@ -25,7 +26,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        MobileAds.initialize(this) {}
+        MobileAds.initialize(this) {
+            AdManager.loadAd(this) // 전면 광고 미리 불러오기
+        }
 
         setContent {
             NotiStickyTheme {

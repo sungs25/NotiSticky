@@ -16,32 +16,39 @@ class MemoAddViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var content = mutableStateOf("")
-        private set
+    val content = mutableStateOf("")
 
     private var currentMemoId = mutableStateOf(0L)
 
-    // [핵심 1] 작업 진행 상태를 나타내는 변수 (중복 실행 방지용 Lock 역할)
-    var isLoading = mutableStateOf(false)
-        private set
+    // 작업 진행 상태를 나타내는 변수 (중복 실행 방지용 Lock 역할)
+    val isLoading = mutableStateOf(false)
+
+    // DB에서 처음 불러온 '원본' 내용을 기억해 둘 변수
+    private var originalContent = ""
 
     val isEditMode: Boolean
         get() = currentMemoId.value != 0L
+
+    // 현재 내용이 원본과 다른지(수정되었는지) 확인하는 플래그
+    val isModified: Boolean
+        get() = content.value != originalContent
 
     init {
         val memoId = savedStateHandle.get<Long>("memoId") ?: -1L
         if (memoId != -1L) {
             viewModelScope.launch {
-                if (isLoading.value) return@launch // 이미 불러오는 중이면 무시
+                if (isLoading.value) return@launch
 
                 isLoading.value = true
                 try {
                     repository.getMemoById(memoId)?.let { existingMemo ->
                         currentMemoId.value = existingMemo.id
                         content.value = existingMemo.content
+
+
+                        originalContent = existingMemo.content
                     }
                 } catch (e: Exception) {
-                    // DB 읽기 실패 시 안전하게 에러 로그만 남김 (앱 안 죽음)
                     e.printStackTrace()
                 } finally {
                     isLoading.value = false // 성공하든 실패하든 무조건 락 해제
@@ -57,17 +64,21 @@ class MemoAddViewModel @Inject constructor(
     fun saveMemo(onSaved: () -> Unit) {
         val text = content.value
 
-        // [핵심 2] 빈 내용이거나, 이미 저장 중(isLoading == true)이면 실행 안 함 (따닥 방지)
-        if (text.isBlank() || isLoading.value) return
+        if (text.isBlank() || isLoading.value || !isModified) {
+            onSaved() // 아무것도 안 하고 그냥 성공한 척 화면만 닫게 넘겨버림
+            return
+        }
 
         viewModelScope.launch {
             isLoading.value = true
             try {
                 val memo = MemoEntity(id = currentMemoId.value, content = text)
                 repository.insert(memo)
+
+                originalContent = text
+
                 onSaved() // 정상 저장 시 화면 닫기
             } catch (e: Exception) {
-                // 저장 실패 시 처리 (Toast 띄워주면 더 좋음)
                 e.printStackTrace()
             } finally {
                 isLoading.value = false
