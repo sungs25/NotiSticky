@@ -18,11 +18,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import androidx.navigation.navDeepLink
+import com.google.android.gms.ads.MobileAds
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MobileAds.initialize(this) {}
+
         setContent {
             NotiStickyTheme {
 

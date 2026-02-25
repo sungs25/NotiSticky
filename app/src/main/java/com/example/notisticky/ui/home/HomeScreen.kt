@@ -12,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.notisticky.ui.components.AdmobBanner
 import com.example.notisticky.ui.components.MemoItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,15 +29,29 @@ fun HomeScreen(
     val memos by viewModel.memoList.collectAsStateWithLifecycle()
 
     Scaffold(
+        topBar = { /* ... */ },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClick,
-                containerColor = Color(0xFF333333),
-                contentColor = Color.White
+                modifier = Modifier.padding(16.dp),
+                containerColor = Color(0xFF333333)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "메모 추가")
+                Icon(Icons.Filled.Add, "추가", tint = Color.White)
             }
-        }
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = 12.dp,
+                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    )
+            ) {
+                AdmobBanner()
+            }
+        },
+        containerColor = Color.White
     ) { innerPadding ->
         Box(
             modifier = Modifier

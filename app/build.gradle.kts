@@ -75,6 +75,7 @@ dependencies {
 
     // 4. Google AdMob (광고 - Firebase 없이 단독 사용)
     implementation("com.google.android.gms:play-services-ads:23.3.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
