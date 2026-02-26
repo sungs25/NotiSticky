@@ -8,13 +8,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.notisticky"
+    namespace = "com.sungs.notisticky"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.notisticky"
+        applicationId = "com.sungs.notisticky"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -30,7 +30,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true // 난독화 켜기
+            isShrinkResources = true // 안 쓰는 리소스 다이어트
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
