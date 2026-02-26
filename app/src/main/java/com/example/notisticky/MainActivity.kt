@@ -4,44 +4,47 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels // 🌟 [추가] 뷰모델을 액티비티 레벨에서 쓰기 위해 필요
 import androidx.compose.runtime.LaunchedEffect
-import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.notisticky.ui.add.MemoAddScreen
 import com.example.notisticky.ui.home.HomeScreen
-import com.example.notisticky.ui.theme.NotiStickyTheme
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.navigation.navArgument
-import androidx.navigation.NavType
-import androidx.navigation.navDeepLink
 import com.example.notisticky.ui.onboarding.OnboardingScreen
+import com.example.notisticky.ui.theme.NotiStickyTheme
 import com.example.notisticky.util.AdManager
 import com.google.android.gms.ads.MobileAds
-import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
 
+        splashScreen.setKeepOnScreenCondition {
+            mainViewModel.isLoading.value
+        }
+
         MobileAds.initialize(this) {
-            AdManager.loadAd(this) // 전면 광고 미리 불러오기
+            AdManager.loadAd(this)
         }
 
         setContent {
             NotiStickyTheme {
-
-                val mainViewModel: MainViewModel = hiltViewModel()
-
-                if (mainViewModel.isLoading.value) {
-                    // DataStore에서 값을 읽어오는 0.1초 동안 텅 빈 하얀 화면을 그려서 대기합니다.
-                } else {
-                    // 로딩이 끝났다면 본격적으로 앱 화면을 그리기
-
+                if (!mainViewModel.isLoading.value) {
 
                     val navController = rememberNavController()
 
@@ -50,12 +53,11 @@ class MainActivity : ComponentActivity() {
                         startDestination = mainViewModel.startDestination.value
                     ) {
 
-                        // 온보딩 화면 추가
+                        // 온보딩 화면
                         composable("onboarding") {
                             OnboardingScreen(
                                 onFinish = {
                                     mainViewModel.finishOnboarding()
-
                                     navController.navigate("home") {
                                         popUpTo("onboarding") { inclusive = true }
                                     }
@@ -91,7 +93,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                } // else 닫기
+                }
             }
         }
     }

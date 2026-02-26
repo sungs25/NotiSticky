@@ -87,4 +87,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0") // DataStore 라이브러리
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
