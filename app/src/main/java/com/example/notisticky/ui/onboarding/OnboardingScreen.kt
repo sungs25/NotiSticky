@@ -211,11 +211,9 @@ fun OnboardingPageContent(page: OnboardingPage) {
                     statusBarManager.requestAddTileService(
                         componentName,
                         "새 메모 작성", // 팝업에 보일 타일 이름
-                        Icon.createWithResource(context, R.drawable.ic_launcher_foreground), // 타일 아이콘
+                        Icon.createWithResource(context, R.drawable.ic_notification),
                         context.mainExecutor,
-                        { result ->
-                            // 결과 처리 (성공/실패/이미 있음 등). 지금은 팝업만 띄우면 되므로 비워둡니다.
-                        }
+                        { result -> }
                     )
                 },
                 colors = ButtonDefaults.buttonColors(

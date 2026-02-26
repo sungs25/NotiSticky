@@ -87,7 +87,7 @@ class NotificationHelper @Inject constructor(
 
         // 알림 꾸미기 (builder)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(null)
             .setContentText(memo.content)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -96,7 +96,7 @@ class NotificationHelper @Inject constructor(
             .setDeleteIntent(dismissPendingIntent)
             .addAction(
                 android.R.drawable.ic_menu_close_clear_cancel,
-                "고정 해제", // 텍스트 변경
+                "고정 해제",
                 unpinPendingIntent
             )
 
