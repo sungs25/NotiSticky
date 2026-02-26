@@ -1,5 +1,6 @@
 package com.sungs.notisticky.ui.onboarding
 
+import com.sungs.notisticky.R
 import android.app.StatusBarManager
 import android.content.ComponentName
 import android.graphics.drawable.Icon

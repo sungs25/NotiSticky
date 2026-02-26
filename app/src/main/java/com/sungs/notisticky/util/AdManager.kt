@@ -12,7 +12,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 object AdManager {
     private var interstitialAd: InterstitialAd? = null
     // 구글 전면 광고 테스트 ID
-    private const val AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"
+    private const val AD_UNIT_ID = "ca-app-pub-9893904660889699/6604550022"
 
     // 몇 번 저장할 때마다 띄울 것인가
     private const val SHOW_FREQUENCY = 4

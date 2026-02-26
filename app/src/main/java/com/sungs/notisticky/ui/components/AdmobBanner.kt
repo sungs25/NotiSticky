@@ -15,8 +15,7 @@ fun AdmobBanner(modifier: Modifier = Modifier) {
         factory = { context ->
             AdView(context).apply {
                 setAdSize(AdSize.BANNER)
-                // 구글이 제공하는 테스트용 배너 ID
-                adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                adUnitId = "ca-app-pub-9893904660889699/1408422453"
                 loadAd(AdRequest.Builder().build())
             }
         }
