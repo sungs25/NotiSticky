@@ -6,8 +6,6 @@ DI: Hilt
 DB: Room
 광고: Google AdMob
 
-빌드
-bash# 클론
 git clone https://github.com/sungs25/notisticky.git
 
 # Android Studio에서 열기
