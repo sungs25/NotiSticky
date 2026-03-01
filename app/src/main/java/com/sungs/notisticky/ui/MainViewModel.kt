@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sungs.notisticky.data.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,12 +22,9 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            // 앱이 켜지자마자 DataStore를 확인
-            userPreferencesRepository.isFirstLaunch.collect { isFirst ->
-                // 처음 켰으면 온보딩, 아니면 홈 화면으로 목적지 설정!
-                startDestination.value = if (isFirst) "onboarding" else "home"
-                isLoading.value = false
-            }
+            val isFirst = userPreferencesRepository.isFirstLaunch.first()
+            startDestination.value = if (isFirst) "onboarding" else "home"
+            isLoading.value = false
         }
     }
 
